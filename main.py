@@ -65,6 +65,9 @@ class MainWindow(QtWidgets.QMainWindow, main_win.Ui_MainWindow):
         self.cycleMeasurementPButton.clicked.connect(self.start_cycle_measurement)
         self.cycleMeasurementPButton.setStyleSheet("background-color: " + "lightgreen")
 
+        self.constantModePButton.clicked.connect(self.start_constant_mode)
+        self.constantModePButton.setStyleSheet("background-color: " + "lightgreen")
+
         # управление калибровками
         self.calibrationTWidget.cellChanged.connect(self.update_calibration_coeff_from_table)
 
@@ -154,9 +157,17 @@ class MainWindow(QtWidgets.QMainWindow, main_win.Ui_MainWindow):
 
     def start_cycle_measurement(self):
         if self.cycleMeasurementPButton.isChecked() is False:
-            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="none")
+            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="cycle_off")
         elif self.cycleMeasurementPButton.isChecked() is True:
-            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="cycle")
+            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="cycle_on")
+        pass
+
+    def start_constant_mode(self):
+        if self.constantModePButton.isChecked() is True:
+            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="const_on")
+        else:
+            self.dnt.set_param(meas_time_s=self.dnt.measurement_time, dead_time_ms=self.dnt.dead_time, dnt_mode="const_off")
+            pass
         pass
 
     def update_calibration_coeff_from_table(self, row, column):

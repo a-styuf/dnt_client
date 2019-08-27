@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1141</width>
-    <height>837</height>
+    <height>887</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -280,18 +280,15 @@
        <string>Управление</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="10" column="0" colspan="2">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="11" column="0" colspan="2">
+        <widget class="QLabel" name="oscLabel">
+         <property name="text">
+          <string>Осциллограмма</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
-        </spacer>
+        </widget>
        </item>
        <item row="3" column="1">
         <widget class="QPushButton" name="getParamPButton">
@@ -310,20 +307,40 @@
          </property>
         </widget>
        </item>
-       <item row="11" column="0" colspan="2">
-        <widget class="QLabel" name="oscLabel">
-         <property name="text">
-          <string>Осциллограмма</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-        </widget>
-       </item>
        <item row="3" column="0">
         <widget class="QPushButton" name="setParamPButton">
          <property name="text">
           <string>Установить</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="deadTimeLabel">
+         <property name="text">
+          <string>Мертвое время, мс</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="measurementTimeSBox">
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>20</number>
          </property>
         </widget>
        </item>
@@ -468,27 +485,13 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="measurementTimeSBox">
-         <property name="minimum">
-          <number>1</number>
-         </property>
-         <property name="maximum">
-          <number>20</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="deadTimeLabel">
+       <item row="8" column="0" colspan="2">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Мертвое время, мс</string>
+          <string>Калибровка</string>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="measurementTimeLabel">
-         <property name="text">
-          <string>Время измерения, с</string>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -525,13 +528,10 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="0" colspan="2">
-        <widget class="QLabel" name="label_8">
+       <item row="1" column="0">
+        <widget class="QLabel" name="measurementTimeLabel">
          <property name="text">
-          <string>Калибровка</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <string>Время измерения, с</string>
          </property>
         </widget>
        </item>
@@ -633,6 +633,16 @@
            <string>0</string>
           </property>
          </item>
+        </widget>
+       </item>
+       <item row="7" column="0" colspan="2">
+        <widget class="QPushButton" name="constantModePButton">
+         <property name="text">
+          <string>Режим констант</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
       </layout>

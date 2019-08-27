@@ -5,6 +5,8 @@ import copy
 from ctypes import c_int8, c_int16
 import configparser
 import os
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 class DateControl:
@@ -172,7 +174,7 @@ class DateControl:
         print(self.report)
         if self.row_read_frame[0] == 0x0FF1 and self.check_frame_definer(self.row_read_frame[1], frame_type=1):
             # данные в лист с данными ДНТ
-            self.dnt_mode = self.row_read_frame[6] & 0x03
+            self.dnt_mode = self.row_read_frame[6] & 0xFF
             self.measurement_time = self.row_read_frame[2]
             self.dead_time = self.row_read_frame[3]
             return 1
@@ -197,7 +199,7 @@ class DateControl:
                 self.dnt_read_data[i][2] = "%.3E" % numpy.std(self.graph_data[i][1])
                 self.dnt_read_data[i][3] = "%.3E" % max(self.graph_data[i][1])
                 self.dnt_read_data[i][4] = "%.3E" % min(self.graph_data[i][1])
-        except Exception as error:
+        except RuntimeWarning as error:
             print("calc_statistic_data" + error)
 
     def reset_graph_data(self):
@@ -205,6 +207,10 @@ class DateControl:
         pass
 
     def set_param(self, meas_time_s=1, dead_time_ms=100, dnt_mode="none", osc_ku=0, osc_mode="adc"):
+        # читаем параметры dnt для того, что бы не затереть старые
+        self.read_parameters_data()
+        print(self.dnt_mode)
+        #
         self.measurement_time = meas_time_s
         self.dead_time = dead_time_ms
         self.row_write_frame = [0xFAFA for i in range(32)]
@@ -215,18 +221,25 @@ class DateControl:
         self.row_write_frame[4] = 0x0000 if osc_mode == "adc" else 0x0001
         self.row_write_frame[5] = osc_ku
         if "none" in dnt_mode:
-            mode_uint16 = 0x0000
-        elif "cycle" in dnt_mode:
-            mode_uint16 = 0x0004
+            mode_uint16 = 0x00
+        elif "cycle_on" in dnt_mode:
+            mode_uint16 = self.dnt_mode | 0x04
+        elif "cycle_off" in dnt_mode:
+            mode_uint16 = self.dnt_mode & (~0x04)
         elif "single" in dnt_mode:
-            mode_uint16 = 0x0002
+            mode_uint16 = 0x02
         elif "osc" in dnt_mode:
-            mode_uint16 = 0x0001
+            mode_uint16 = self.dnt_mode | 0x01
+        elif "const_on" in dnt_mode:
+            mode_uint16 = self.dnt_mode | 0x10
+        elif "const_off" in dnt_mode:
+            mode_uint16 = self.dnt_mode & (~0x10)
         else:
-            mode_uint16 = 0x0000
+            mode_uint16 = 0x00
         self.row_write_frame[6] = mode_uint16
         #
         self.report = list_to_str(self.row_write_frame)
+        print(mode_uint16)
         print(self.report)
         #
         aw = self.mko.SendToRT(self.mko_address, 29, self.row_write_frame, 32)
