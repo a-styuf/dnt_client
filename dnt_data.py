@@ -1,5 +1,5 @@
 import time
-import mko
+import ta1_mko
 import numpy
 import copy
 from ctypes import c_int8, c_int16
@@ -12,11 +12,13 @@ warnings.filterwarnings("ignore", category=RuntimeWarning)
 class DateControl:
     def __init__(self):
         # mko  класс для общения с ДНТ
-        self.mko = mko.TA1()
+        self.mko = ta1_mko.Device()
         self.mko.init()
         self.dnt_mko_connect = 0
         # общие параметры ДНТ
         self.mko_address = 19
+        self.data_sa = 30
+        self.parameters_sa = 29
         self.fabrication_number = u"не выбран"
         self.report = ""  # вывод сырой строки МКО
         # калибровочные коэффициенты
@@ -140,13 +142,13 @@ class DateControl:
                                   fabrication_number=fabrication_number_int, frame_type=frame_type)
 
     def read_gen_data(self):
-        self.row_read_frame = self.mko.ReadFromRT(self.mko_address, 30, 32)
+        self.row_read_frame = self.mko.read_from_rt(self.mko_address, self.data_sa, 32)
         self.report = list_to_str(self.row_read_frame)
         print(self.report)
         if self.row_read_frame[0] == 0x0FF1 and self.check_frame_definer(self.row_read_frame[1], frame_type=0):
 
             # данные в лист с данными ДНТ
-            self.dnt_read_data[0][0] = "%.1f" % time.clock()
+            self.dnt_read_data[0][0] = "%.1f" % time.perf_counter()
 
             self.dnt_read_data[1][0] = "%d" % ((c_int16(self.row_read_frame[3]).value << 16) +
                                                c_int16(self.row_read_frame[4]).value)
@@ -169,7 +171,7 @@ class DateControl:
         pass
 
     def read_parameters_data(self):
-        self.row_read_frame = self.mko.ReadFromRT(self.mko_address, 29, 32)
+        self.row_read_frame = self.mko.read_from_rt(self.mko_address, self.parameters_sa, 32)
         self.report = list_to_str(self.row_read_frame)
         print(self.report)
         if self.row_read_frame[0] == 0x0FF1 and self.check_frame_definer(self.row_read_frame[1], frame_type=1):
@@ -242,7 +244,7 @@ class DateControl:
         print(mode_uint16)
         print(self.report)
         #
-        aw = self.mko.SendToRT(self.mko_address, 29, self.row_write_frame, 32)
+        aw = self.mko.send_to_rt(self.mko_address, self.parameters_sa, self.row_write_frame, 32)
         pass
 
     def start_osc(self, osc_ku=0, osc_mode="adc"):  # ku: 0-1, 1-10, 2-100, 3-1000
@@ -265,7 +267,7 @@ class DateControl:
     def read_osc(self):
         self.row_osc_data = []
         for i in range(16):
-            self.row_osc_data.extend(self.mko.ReadFromRT(self.mko_address, i + 1, 32))
+            self.row_osc_data.extend(self.mko.read_from_rt(self.mko_address, i + 1, 32))
             # print(list_to_str(self.row_osc_data[-32:]))
         self.osc_graph_data[self.osc_data_type][1] = []
         for num, var in enumerate(self.row_osc_data):
